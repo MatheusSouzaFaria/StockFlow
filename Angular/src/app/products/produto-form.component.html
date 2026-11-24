@@ -1,0 +1,14 @@
+<section class="form-card" aria-labelledby="form-title">
+  <div class="section-heading"><div><p class="eyebrow">GESTÃO DE PRODUTOS</p><h2 id="form-title">{{ produto ? 'Editar produto' : 'Novo produto' }}</h2><p>Preencha os dados para salvar no estoque.</p></div></div>
+  <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+    <fieldset [disabled]="ocupado" class="fields">
+      <div class="field"><label for="nome">Nome *</label><input id="nome" formControlName="nome" maxlength="255" placeholder="Ex.: Caderno" [attr.aria-invalid]="invalido('nome')">@if(invalido('nome')){<small class="field-error">Informe um nome válido (até 255 caracteres).</small>}</div>
+      <div class="field"><label for="categoria">Categoria *</label><input id="categoria" formControlName="categoria" maxlength="255" placeholder="Ex.: Papelaria" [attr.aria-invalid]="invalido('categoria')">@if(invalido('categoria')){<small class="field-error">Informe uma categoria válida (até 255 caracteres).</small>}</div>
+      <div class="field full"><label for="descricao">Descrição <span>opcional</span></label><textarea id="descricao" formControlName="descricao" maxlength="2000" rows="3" placeholder="Detalhes do produto"></textarea>@if(invalido('descricao')){<small class="field-error">Máximo de 2000 caracteres.</small>}</div>
+      <div class="field"><label for="quantidade">Quantidade *</label><input id="quantidade" type="number" min="0" max="2147483647" step="1" formControlName="quantidade" [attr.aria-invalid]="invalido('quantidade')">@if(invalido('quantidade')){<small class="field-error">Informe um inteiro de 0 a 2147483647.</small>}</div>
+      <div class="field"><label for="minimo">Estoque mínimo *</label><input id="minimo" type="number" min="0" max="2147483647" step="1" formControlName="estoqueMinimo" [attr.aria-invalid]="invalido('estoqueMinimo')">@if(invalido('estoqueMinimo')){<small class="field-error">Informe um inteiro de 0 a 2147483647.</small>}</div>
+    </fieldset>
+    @if(produto){<p class="hint">O PUT atualiza todos os campos. Se o saldo mudar no Expo durante a edição, será necessário reabrir o formulário.</p>}
+    <div class="form-actions"><button type="button" class="btn secondary" (click)="cancelar.emit()" [disabled]="ocupado">Cancelar</button><button type="submit" class="btn primary" [disabled]="ocupado">{{ ocupado ? 'Salvando…' : 'Salvar produto' }}</button></div>
+  </form>
+</section>
