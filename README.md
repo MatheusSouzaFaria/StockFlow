@@ -85,3 +85,152 @@ A versão avaliada será a da branch `main`.
 - Expo / React Native
 - GitHub
 - GitHub Projects
+
+---
+
+## ⚙️ Guia de Execução — StockFlow
+
+Este guia explica como executar o projeto completo localmente no Windows. O Java é responsável pela API e pelo banco H2, enquanto o Angular e o Expo são as interfaces web e mobile.
+
+### 1. Pré-requisitos
+
+- **Java JDK:** versão 17 ou 21.
+- **Node.js:** versão 22 LTS (22.12 ou superior), disponível no [site oficial](https://nodejs.org/).
+- **NPM:** instalado junto com o Node.js.
+- **Git e GitHub Desktop:** para clonar e versionar o projeto.
+- **VS Code:** para abrir o projeto e executar os comandos.
+- **Internet:** necessária na primeira instalação das dependências.
+
+### 2. Clonar o repositório
+
+No GitHub Desktop, acesse `File → Clone repository`, selecione o repositório StockFlow e clique em `Clone`. Selecione a branch `main` e atualize-a com `Fetch origin` e `Pull origin`, caso necessário.
+
+Abra a pasta raiz do projeto no VS Code. A estrutura esperada é:
+
+```text
+StockFlow/
+├── backend/
+├── frontend-web/
+├── frontend-mobile/
+└── README.md
+```
+
+### 3. Como rodar o Backend (Java Spring Boot)
+
+Abra o primeiro terminal PowerShell no VS Code, a partir da raiz do projeto:
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+
+As dependências Java são gerenciadas pelo Maven. **Não execute `npm install` na pasta backend.** O banco H2 é iniciado automaticamente e armazena os produtos em `backend/data/`.
+
+> ✅ **Sucesso:** acesse http://localhost:8080/api/produtos. Uma lista de produtos ou `[]` indica que a API está respondendo.
+
+Mantenha este terminal aberto. Caso o inicializador Maven não consiga baixar suas dependências, utilize Maven previamente instalado e execute `mvn spring-boot:run` dentro de `backend/`.
+
+### 4. Como rodar o Frontend Web (Angular)
+
+Abra um segundo terminal PowerShell, novamente na raiz do projeto:
+
+```powershell
+cd frontend-web
+npm install
+npm start
+```
+
+> ✅ **Sucesso:** acesse http://localhost:4200 após a compilação.
+
+O Angular permite cadastrar, consultar, editar, excluir e filtrar produtos. Mantenha este terminal aberto.
+
+### 5. Como rodar o Frontend Mobile (Expo)
+
+Abra um terceiro terminal PowerShell, novamente na raiz do projeto:
+
+```powershell
+cd frontend-mobile
+npm install
+npm run web
+```
+
+> ✅ **Sucesso:** acesse http://localhost:8081 ou o endereço informado pelo terminal.
+
+O Expo permite consultar produtos e registrar entradas e saídas de estoque. Mantenha este terminal aberto.
+
+**Importante:** o `npm install` deve ser executado separadamente em `frontend-web/` e `frontend-mobile/`. Os três terminais precisam permanecer abertos durante a utilização do sistema.
+
+### 6. Configurar a API para outros computadores e celulares
+
+Se os três projetos estiverem no mesmo computador, utilize a API padrão:
+
+```text
+http://localhost:8080/api/produtos
+```
+
+Se o Angular ou o Expo estiver em outro dispositivo, execute no computador que roda o Java:
+
+```powershell
+ipconfig
+```
+
+Identifique o endereço IPv4 da rede utilizada. No exemplo abaixo, `192.168.1.100` é apenas um IP ilustrativo: substitua pelo IP real.
+
+**Angular:** altere o arquivo `frontend-web/src/app/core/api.config.ts`:
+
+```typescript
+export const API_URL = 'http://192.168.1.100:8080/api/produtos';
+```
+
+**Expo:** dentro de `frontend-mobile/`, copie `.env.example` para `.env` e configure:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.100:8080/api/produtos
+```
+
+Reinicie os frontends após a alteração. Para utilizar o Expo Go no celular, execute `npm start` dentro de `frontend-mobile/` e escaneie o QR Code com uma versão do Expo Go compatível com o SDK 54. Também é possível utilizar a versão web.
+
+Todos os dispositivos devem estar na mesma rede, com acesso permitido à porta 8080. O Angular e o Expo devem utilizar **uma única instância do backend Java**, compartilhando o mesmo banco H2. Não exponha o servidor de desenvolvimento à internet.
+
+### 7. Como funciona o projeto
+
+O Java Spring Boot recebe as requisições da API REST, valida os dados, executa as regras de estoque e salva os produtos no H2. O Angular realiza o gerenciamento dos produtos e o Expo registra as movimentações. Quando uma entrada ou saída é realizada pelo Expo, o Java atualiza o banco e o Angular pode consultar o novo saldo ao atualizar sua listagem.
+
+| Tecnologia | Endereço local padrão |
+|---|---|
+| API Java | http://localhost:8080/api/produtos |
+| Angular | http://localhost:4200 |
+| Expo Web | http://localhost:8081 |
+| Console H2 | http://localhost:8080/h2-console |
+
+### 8. Teste de integração
+
+1. Cadastre no Angular um produto chamado **Caderno**, com quantidade 10 e estoque mínimo 3.
+2. Atualize a listagem do Expo e abra o produto.
+3. Registre uma saída de 8 unidades no Expo.
+4. Atualize o Angular e confirme o saldo de 2 unidades, com indicação de estoque baixo.
+5. Tente retirar mais 3 unidades no Expo.
+6. Confirme a mensagem de estoque insuficiente e que o saldo continua em 2 unidades.
+
+Esse procedimento demonstra a integração real entre Angular, Java, H2 e Expo.
+
+---
+
+## ✅ Conceito de Pronto — Definition of Done (DoD)
+
+Uma Issue será considerada pronta quando cumprir seus requisitos funcionais e técnicos, possuir evidências de funcionamento e estiver revisada e integrada ao repositório oficial.
+
+- [ ] Todos os requisitos da Issue foram implementados.
+- [ ] O código está organizado e executa sem erros impeditivos.
+- [ ] As funcionalidades, validações e regras de negócio foram testadas.
+- [ ] A integração com a API real foi verificada, quando aplicável.
+- [ ] Não existem dados fictícios substituindo o backend.
+- [ ] O desenvolvimento foi realizado em uma branch de funcionalidade.
+- [ ] Os commits seguem o padrão de emoji, tipo e descrição objetiva.
+- [ ] O Pull Request está vinculado às Issues correspondentes.
+- [ ] O código foi revisado e aprovado por outro integrante.
+- [ ] As alterações foram integradas à branch `main`.
+- [ ] A Issue foi movida para a coluna Concluído no GitHub Projects.
+- [ ] A documentação foi atualizada, quando necessário.
+
+O projeto estará pronto para entrega quando as funcionalidades obrigatórias estiverem implementadas, testadas e integradas, permitindo a demonstração completa do StockFlow conforme os requisitos do professor.
